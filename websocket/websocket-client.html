@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<script>
+  let ws = new WebSocket("ws://192.168.0.7:80/");
+  ws.onopen = function (msg) {
+      console.log("Connected");
+    };
+    ws.onclose = function (msg) {
+      console.log("Closed");
+    };
+    ws.onmessage = function (msg) {
+      console.log(msg.data);
+    };
+</script>
+</body>
+
+</html>
