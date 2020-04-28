@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Control Servo with ESP32 using Websocket</title>
+</head>
+
+<body>
+    <div id="container" style="width:100vw; height:100vw">
+        <div id="dx">dx: </div>
+        <div id="dy">dy: </div>
+    </div>
+</body>
+<script src="virtualjoystick.js"></script>
+<script>
+    let ws = new WebSocket("ws://192.168.0.7:80/");
+  ws.onopen = function (msg) {
+      console.log("Connected");
+    };
+    ws.onclose = function (msg) {
+      console.log("Closed");
+    };
+    ws.onmessage = function (msg) {
+      console.log(msg.data);
+    };
+
+    let joystick = new VirtualJoystick({
+        container: document.getElementById("container"),
+        mouseSupport: true,
+        limitStickTravel: true,
+        stickRadius: 90
+    });
+    let dx_prev;
+    function cast() {
+        let dx = Math.round(joystick.deltaX());
+        let dy = Math.round(joystick.deltaY());
+        document.getElementById("dx").innerHTML = "dx : " + dx;
+        document.getElementById("dy").innerHTML = "dy : " + dy;
+        //ws.send(dx);
+        if(dx != dx_prev){
+            ws.send(dx);
+            dx_prev = dx;
+        }
+    }
+    setInterval(cast, 0);
+</script>
