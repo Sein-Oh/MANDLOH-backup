@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Control Servo with ESP32 using Websocket</title>
+</head>
+
+<body>
+    <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+    <div id="container" style="width:100vw; height:100vw">
+        <div id="dx">dx: </div>
+        <div id="dy">dy: </div>
+    </div>
+</body>
+<script src="virtualjoystick.js"></script>
+<script src="mwb.js"></script>
+<script>
+
+    let joystick = new VirtualJoystick({
+        container: document.getElementById("container"),
+        mouseSupport: true,
+        limitStickTravel: true,
+        stickRadius: 90
+    });
+    let dx_prev;
+    function cast() {
+        let dx = Math.round(joystick.deltaX());
+        let dy = Math.round(joystick.deltaY());
+        document.getElementById("dx").innerHTML = "dx : " + dx;
+        document.getElementById("dy").innerHTML = "dy : " + dy;
+        if(dx != dx_prev){
+            send(dx);
+            dx_prev = dx;
+        }
+    }
+    setInterval(cast, 0);
+
+    function connect(){
+        mwb.uart.start();
+    }
+
+    function disconnect(){
+        mwb.uart.stop();
+    }
+
+    function send(command){
+        let msg = command + "\n";
+        mwb.uart.send(msg);
+        console.log(msg);
+    }
+</script>
