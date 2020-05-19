@@ -1,0 +1,41 @@
+<html>
+
+<head>
+    <title>WebRTC basic code</title>
+</head>
+
+<body>
+    <video autoplay id="videoInput" width="320" height="240"></video>
+    <canvas id="videoOutput" width="320" height="240" style="visibility: hidden;"></canvas>
+    <a id="download" download="canvas.jpg">
+        <button id="save" onclick="save()">Download Image</button>
+    </a>
+    <script>
+        const constraints = { audio: false, video: true };
+        const video = document.getElementById("videoInput");
+        const canvas = document.getElementById("videoOutput");
+        const ctx = canvas.getContext("2d");
+        const download = document.getElementById("download");
+
+        function successCallback(stream) {
+            video.srcObject = stream;
+            video.play();
+        }
+
+        function errorCallback(error) {
+            console.log(error);
+        }
+        navigator.getUserMedia(constraints, successCallback, errorCallback);
+
+        function save() {
+            ctx.drawImage(video, 0, 0, 320, 240);
+            image = canvas.toDataURL("image/png", 1.0).replace("image/png", "image/octet-stream");
+            var link = document.createElement('a');
+            link.download = "canvas.png";
+            link.href = image;
+            link.click();
+        }
+    </script>
+</body>
+
+</html>
