@@ -3,18 +3,17 @@ import tkinter
 w, h = 640, 480
 
 layout = [[sg.Graph((w,h),(0,h), (w,0), key='-GRAPH-', enable_events=True, drag_submits=True)],]
-window = sg.Window('Demo', layout, location=(10, 10), return_keyboard_events=True)
+window = sg.Window('KCF tracker', layout, location=(10, 10), return_keyboard_events=True)
+
 fig = None
 mouse_down = False
 tracking = False
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, w/2) #Set caputre size
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h/2)
-
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, w) #Set caputre size
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
 
 while True:
     ret, frame = cap.read()
-    frame = cv2.resize(frame, dsize=(w, h), interpolation=cv2.INTER_AREA)
     event, values = window.read(timeout=0)
     if event in ('Exit', None):
         break
@@ -22,7 +21,6 @@ while True:
     elif event == '-GRAPH-': #Mouse down event.
         if not mouse_down: #Triggerd 1 time.
             mouse_start = (values['-GRAPH-'][0], values['-GRAPH-'][1])
-            print('start:{}'.format(mouse_start))
         mouse_pos = (values['-GRAPH-'][0], values['-GRAPH-'][1])
         mouse_down = True
         tracking = False
@@ -39,15 +37,18 @@ while True:
         tracking = False
         print('Release tracking mode.')
 
+    elif event == 'q':
+        break
+
+    if mouse_down:
+        cv2.rectangle(frame, mouse_start, mouse_pos, (0,255,0), 2)
+
     if tracking:
         found, track_pos = tracker.update(frame)
         if found:
             p1 = (int(track_pos[0]), int(track_pos[1]))
             p2 = (int(track_pos[0] + track_pos[2]), int(track_pos[1] + track_pos[3]))
             cv2.rectangle(frame, p1, p2, (255,0,0), 2)
-
-    if mouse_down:
-        cv2.rectangle(frame, mouse_start, mouse_pos, (0,255,0), 2)
 
     imgbytes = cv2.imencode('.png', frame)[1].tobytes()
     if fig:
