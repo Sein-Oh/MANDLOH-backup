@@ -30,7 +30,7 @@ while True:
         if not tracking:
             tracking = True
             tracker = cv2.TrackerKCF_create()
-            bbox = (mouse_start[0], mouse_start[1], mouse_pos[0] - mouse_start[0], mouse_pos[1] - mouse_start[1])
+            bbox = (min(mouse_start[0], mouse_pos[0]), min(mouse_start[1], mouse_pos[1]), abs(mouse_pos[0] - mouse_start[0]), abs(mouse_pos[1] - mouse_start[1]))
             tracker.init(frame, bbox)
 
     elif event == 'r': #keyboard event
