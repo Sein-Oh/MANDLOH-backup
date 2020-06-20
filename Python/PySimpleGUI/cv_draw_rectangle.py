@@ -6,11 +6,12 @@ graph_elem = window['-GRAPH-']
 a_id = None
 mouse_down = False
 cap = cv2.VideoCapture(0)
-cap.set(3, 640) #Set camera size
-cap.set(4, 480)
+cap.set(3, 320) #Set camera size
+cap.set(4, 240)
 
 while True:
     ret, frame = cap.read()
+    frame = cv2.resize(frame, dsize=(640, 480), interpolation=cv2.INTER_AREA)
     event, values = window.read(timeout=0)
     if event in ('Exit', None):
         break
