@@ -1,0 +1,110 @@
+<html>
+
+<head>
+</head>
+<style>
+    body {
+        background-color: rgb(150, 150, 150);
+        -webkit-user-select: none;
+        color: white;
+        font-size: 20px;
+    }
+
+    button {
+        width: 200px;
+        height: 60px;
+        margin: 6px 1px 6px 1px;
+        font-size: 20px;
+        color: white;
+        background-color: rgb(51, 51, 51);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 9px rgba(104, 104, 104, 0.5);
+    }
+
+    button:active {
+        box-shadow: 0 5px rgba(104, 104, 104, 0.5);
+        transform: translateY(4px);
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+<body>
+    <p>Select 2 files (json, bin)</p>
+    <input type="file" multiple='multiple' id="load" style="border:2px dashed #BDBDBD; width:200px" />
+    <br><br>
+    <button onclick='predict()'>Load and Predict</button>
+    <br>
+    <img id='img'>
+    <canvas id='canvas'></canvas>
+    <br>
+</body>
+<script>
+    let model, result;
+    const localInput = document.getElementById('load');
+    localInput.onchange = () => loadModel();
+    const imgSize = 256;
+
+    const img = document.getElementById('img');
+    img.width = imgSize;
+    img.height = imgSize;
+    img.onload = async () => {
+        const x = tf.browser.fromPixels(img).div(255.0).expandDims();
+        result = await model.predict(x).data();
+        ctx.drawImage(img, 0, 0, imgSize, imgSize);
+        setTimeout(process, 0);
+    }
+    const canvas = document.getElementById('canvas');
+    canvas.width = imgSize;
+    canvas.height = imgSize;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = 'rgb(0, 255, 0)';
+    ctx.lineWidth = 2;
+
+    async function loadModel() {
+        let idxJson, idxBin;
+        for (let i = 0; i < localInput.files.length; i++) {
+            if (localInput.files[i].name.endsWith('json')) {
+                idxJson = i;
+            } else if (localInput.files[i].name.endsWith('bin')) {
+                idxBin = i;
+            }
+        }
+        model = await tf.loadLayersModel(tf.io.browserFiles([localInput.files[idxJson], localInput.files[idxBin]]));
+        await model.summary();
+    }
+
+    async function predict() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = 'multiple';
+        input.onchange = evt => {
+            console.log(`Added ${evt.target.files.length} test images.`);
+            for (let f of evt.target.files) {
+                const url = URL.createObjectURL(f);
+                img.src = url;
+            }
+        }
+        input.click();
+    }
+
+    function process() {
+        let imgData = ctx.getImageData(0, 0, imgSize, imgSize);
+        let cropped_result = result.map(d => {
+            let out;
+            (d > 0.5) ? out = 255 : out = 0;
+            return out;
+        });
+        let j = 0;
+        for (let i = 0; i < imgData.data.length; i += 4) {
+            imgData.data[i] += cropped_result[j]; //R
+            imgData.data[i + 1] += cropped_result[j]; //G
+            imgData.data[i + 2] += cropped_result[j]; //B
+            imgData.data[i + 3] = 255; //A
+            j += 2;
+        }
+        ctx.putImageData(imgData, 0, 0);
+    }
+</script>
+
+</html>
