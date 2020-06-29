@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<title>Tensorflow.js-WASM</title>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+
+<body>
+    <canvas id="output" width="640px" height="480px"></canvas>
+    <video id="input" style="visibility: hidden;"></video>
+</body>
+<script>
+    let model;
+    let isVideoOn = false;
+    const w = 640;
+    const h = 480;
+    const video = document.getElementById("input");
+    const constraints = { audio: false, video: true };
+    video.width = w;
+    video.height = h;
+    function successCallback(stream) {
+        video.srcObject = stream;
+        video.play();
+        isVideoOn = true;
+    }
+    function errorCallback(error) {
+        console.log(error);
+        isVideoOn = false;
+    }
+    navigator.getUserMedia(constraints, successCallback, errorCallback);
+
+    const canvas = document.getElementById("output");
+    const canvasPos = canvas.getBoundingClientRect();
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "rgb(0,255,0)";
+    ctx.strokeStyle = "rgb(50,255,50)";
+    ctx.lineWidth = 10;
+    ctx.font = "15px Arial";
+
+    async function load_model() {
+        model = await blazeface.load();
+    }
+    load_model();
+
+    function check() {
+        if (typeof (model) != undefined && isVideoOn == true) {
+            console.log("Loaded");
+            setTimeout(main, 0);
+        }
+        else {
+            console.log("wait");
+            setTimeout(check, 500);
+        }
+    }
+    check();
+
+    let predictions;
+    async function main() {
+        predictions = await model.estimateFaces(video);
+        ctx.drawImage(video, 0, 0, w, h);
+        if (predictions.length > 0) {
+            for (let i = 0; i < predictions.length; i++) {
+                const start = predictions[i].topLeft;
+                const end = predictions[i].bottomRight;
+                const size = [end[0] - start[0], end[1] - start[1]];
+
+                // const right_eye = predictions[i].landmarks[0];
+                // const left_eye = predictions[i].landmarks[1];
+                ctx.beginPath();
+                // ctx.moveTo(right_eye[0], right_eye[1]);
+                // ctx.lineTo(left_eye[0], left_eye[1]);
+                ctx.rect(start[0], start[1], size[0], size[1]);
+                ctx.stroke();
+            }
+        }
+        setTimeout(main, 0);
+    }
+</script>
+
+</html>
