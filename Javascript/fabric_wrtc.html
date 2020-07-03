@@ -1,0 +1,39 @@
+<html>
+
+<head>
+    <title>WebRTC with fabric.js</title>
+</head>
+<script src='fabric.min.js'></script>
+
+<body>
+    <video autoplay id='webcam' width='640' height='480' style='display:none'></video>
+    <canvas id='canvas' width='640' height='480'></canvas>
+    <script>
+        const canvas = new fabric.Canvas('canvas');
+        const webcamElement = document.getElementById('webcam');
+        const webcam = new fabric.Image(webcamElement, {
+            objectCaching : false,
+        });
+        var constraints = { audio: false, video: true };
+        function successCallback(stream) {
+            webcamElement.srcObject = stream;
+            canvas.setBackgroundImage(webcam);
+            webcam.getElement().play();
+        }
+        function errorCallback(error) {
+            console.log(error);
+        }
+        navigator.getUserMedia(constraints, successCallback, errorCallback);
+        fabric.util.requestAnimFrame(function render()
+			{
+				canvas.renderAll();
+				fabric.util.requestAnimFrame(render);
+			});
+        
+        canvas.on('mouse:down', function () {
+            console.log('down');
+        });
+    </script>
+</body>
+
+</html>
