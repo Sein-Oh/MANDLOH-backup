@@ -1,79 +1,119 @@
-<!DOCTYPE html>
 <html>
-<title>Tensorflow.js-WASM</title>
+
+<head>
+    <title>WebRTC with fabric.js</title>
+</head>
+<script src='fabric.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
 
 <body>
-    <canvas id="output" width="640px" height="480px"></canvas>
-    <video id="input" style="visibility: hidden;"></video>
-</body>
-<script>
-    let model;
-    let isVideoOn = false;
-    const w = 640;
-    const h = 480;
-    const video = document.getElementById("input");
-    const constraints = { audio: false, video: true };
-    video.width = w;
-    video.height = h;
-    function successCallback(stream) {
-        video.srcObject = stream;
-        video.play();
-        isVideoOn = true;
-    }
-    function errorCallback(error) {
-        console.log(error);
-        isVideoOn = false;
-    }
-    navigator.getUserMedia(constraints, successCallback, errorCallback);
+    <p>Hello</p>
+    <video autoplay id='webcam' width='640' height='480' style='display:none'></video>
+    <canvas id='canvas' width='640' height='480'></canvas>
+    <script>
+        let draw = false;
+        let mouseStart, mouseMove;
+        let model;
+        let webcamReady = false;
 
-    const canvas = document.getElementById("output");
-    const canvasPos = canvas.getBoundingClientRect();
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "rgb(0,255,0)";
-    ctx.strokeStyle = "rgb(50,255,50)";
-    ctx.lineWidth = 10;
-    ctx.font = "15px Arial";
+        const canvas = new fabric.Canvas('canvas');
+        canvas.selection = false;
+        const webcamElement = document.getElementById('webcam');
+        const webcam = new fabric.Image(webcamElement, {
+            objectCaching: false,
+        });
 
-    async function load_model() {
-        model = await blazeface.load();
-    }
-    load_model();
-
-    function check() {
-        if (typeof (model) != undefined && isVideoOn == true) {
-            console.log("Loaded");
-            setTimeout(main, 0);
+        var constraints = { audio: false, video: true };
+        function successCallback(stream) {
+            webcamElement.srcObject = stream;
+            canvas.setBackgroundImage(webcam);
+            webcam.getElement().play();
+            webcamReady = true;
         }
-        else {
-            console.log("wait");
-            setTimeout(check, 500);
+        function errorCallback(error) {
+            console.log(error);
         }
-    }
-    check();
+        navigator.getUserMedia(constraints, successCallback, errorCallback);
+        fabric.util.requestAnimFrame(function render() {
+            canvas.renderAll();
+            fabric.util.requestAnimFrame(render);
+        });
 
-    let predictions;
-    async function main() {
-        predictions = await model.estimateFaces(video);
-        ctx.drawImage(video, 0, 0, w, h);
-        if (predictions.length > 0) {
-            for (let i = 0; i < predictions.length; i++) {
-                const start = predictions[i].topLeft;
-                const end = predictions[i].bottomRight;
-                const size = [end[0] - start[0], end[1] - start[1]];
+        async function load_model() {
+            model = await blazeface.load();
+        }
+        load_model();
 
-                // const right_eye = predictions[i].landmarks[0];
-                // const left_eye = predictions[i].landmarks[1];
-                ctx.beginPath();
-                // ctx.moveTo(right_eye[0], right_eye[1]);
-                // ctx.lineTo(left_eye[0], left_eye[1]);
-                ctx.rect(start[0], start[1], size[0], size[1]);
-                ctx.stroke();
+        function check() {
+            if (typeof (model) != undefined && webcamReady == true) {
+                console.log("Loaded");
+                setTimeout(main, 0);
+            }
+            else {
+                console.log("wait");
+                setTimeout(check, 500);
             }
         }
-        setTimeout(main, 0);
-    }
-</script>
+        check();
+
+        async function main() {
+            const predictions = await model.estimateFaces(webcamElement);
+            if (predictions.length > 0) {
+                for (let i = 0; i < predictions.length; i++) {
+                    const start = predictions[i].topLeft;
+                    const end = predictions[i].bottomRight;
+                    const size = [end[0] - start[0], end[1] - start[1]];
+
+                    const right_eye = predictions[i].landmarks[0];
+                    const left_eye = predictions[i].landmarks[1];
+                    bbox.set({
+                        left : start[0],
+                        top : start[1],
+                        width : size[0],
+                        height : size[1],
+                        stroke: 'rgba(0, 230, 0, 1)',
+                    });
+                }
+            }
+            setTimeout(main, 0);
+        }
+
+
+        const bbox = new fabric.Rect({
+            left: 0,
+            top: 0,
+            width: canvas.width,
+            height: canvas.height,
+            fill: 'rgba(0, 0, 0, 0)',
+            stroke: 'rgba(0, 0, 0, 0)',
+            strokeWidth: 5,
+            selectable: false,
+        });
+        canvas.add(bbox);
+
+        canvas.on('mouse:down', function (options) {
+            draw = true;
+            mouseStart = options.pointer;
+            mouseMove = options.pointer;
+        });
+        canvas.on('mouse:move', function (options) {
+            if (draw === true) {
+                mouseMove = options.pointer;
+                bbox.set({
+                    left: Math.min(mouseStart.x, mouseMove.x),
+                    top: Math.min(mouseStart.y, mouseMove.y),
+                    width: Math.max(mouseStart.x, mouseMove.x) - Math.min(mouseStart.x, mouseMove.x),
+                    height: Math.max(mouseStart.y, mouseMove.y) - Math.min(mouseStart.y, mouseMove.y),
+                    stroke: 'rgba(0, 230, 0, 1)',
+                });
+            }
+        });
+        canvas.on('mouse:up', function (options) {
+            draw = false;
+            bbox.set({ stroke: 'rgba(0, 0, 0, 0)' });
+        });
+    </script>
+</body>
 
 </html>
