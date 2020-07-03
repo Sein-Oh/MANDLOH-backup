@@ -6,13 +6,15 @@
 <script src='fabric.min.js'></script>
 
 <body>
+    <p>Hello</p>
     <video autoplay id='webcam' width='640' height='480' style='display:none'></video>
     <canvas id='canvas' width='640' height='480'></canvas>
     <script>
         const canvas = new fabric.Canvas('canvas');
+        canvas.selection = false;
         const webcamElement = document.getElementById('webcam');
         const webcam = new fabric.Image(webcamElement, {
-            objectCaching : false,
+            objectCaching: false,
         });
         var constraints = { audio: false, video: true };
         function successCallback(stream) {
@@ -24,14 +26,45 @@
             console.log(error);
         }
         navigator.getUserMedia(constraints, successCallback, errorCallback);
-        fabric.util.requestAnimFrame(function render()
-			{
-				canvas.renderAll();
-				fabric.util.requestAnimFrame(render);
-			});
-        
-        canvas.on('mouse:down', function () {
-            console.log('down');
+        fabric.util.requestAnimFrame(function render() {
+            canvas.renderAll();
+            fabric.util.requestAnimFrame(render);
+        });
+
+        const bbox = new fabric.Rect({
+            left: 0,
+            top: 0,
+            width: canvas.width,
+            height: canvas.height,
+            fill: 'rgba(0, 0, 0, 0)',
+            stroke: 'rgba(0, 0, 0, 0)',
+            strokeWidth: 5,
+            selectable: false,
+        });
+        canvas.add(bbox);
+
+        let draw = false;
+        let mouseStart, mouseMove;
+        canvas.on('mouse:down', function (options) {
+            draw = true;
+            mouseStart = options.pointer;
+            mouseMove = options.pointer;
+        });
+        canvas.on('mouse:move', function (options) {
+            if (draw === true) {
+                mouseMove = options.pointer;
+                bbox.set({
+                    left: Math.min(mouseStart.x, mouseMove.x),
+                    top: Math.min(mouseStart.y, mouseMove.y),
+                    width: Math.max(mouseStart.x, mouseMove.x) - Math.min(mouseStart.x, mouseMove.x),
+                    height: Math.max(mouseStart.y, mouseMove.y) - Math.min(mouseStart.y, mouseMove.y),
+                    stroke: 'rgba(0, 230, 0, 1)',
+                });
+            }
+        });
+        canvas.on('mouse:up', function (options) {
+            draw = false;
+            bbox.set({stroke: 'rgba(0, 0, 0, 0)'});
         });
     </script>
 </body>
