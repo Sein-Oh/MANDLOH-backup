@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Streaming from OpenCV</title>
+</head>
+
+<body>
+    <img id='img'>
+    <button onclick=run()>Click</button>
+</body>
+<script type="text/javascript" src="/eel.js"></script>
+<script>
+    const img = document.getElementById('img');
+    img.draggable = false;
+    img.addEventListener('mousedown', evt_down)
+
+    async function run() {
+        const data = await eel.window_capture()();
+        img.src = "data:image/jpeg;base64," + data;
+    }
+
+    function evt_down(event) {
+        const img_pos = img.getBoundingClientRect();
+        const x = Math.round(event.clientX - img_pos.left);
+        const y = Math.round(event.clientY - img_pos.top);
+        eel.mouse_event(x, y);
+    }
+</script>
+
+</html>
