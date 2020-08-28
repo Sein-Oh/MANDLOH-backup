@@ -6,7 +6,7 @@ import numpy as np
 
 host = "localhost"
 port = 8000
-html = "index.html"
+html = "tracker.html"
 url = "http://{}:{}/{}".format(host, port, html)
 
 mode = 0  # 0: pc / 1: browser / 2: webserver
