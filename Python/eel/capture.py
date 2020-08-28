@@ -1,7 +1,7 @@
 import cv2, eel, base64
 import numpy as np
 import autoit
-from window_capture import capture
+from hidden_capture import capture
 
 hwnd = autoit.win_get_handle("web")
 eel.init('web')    
