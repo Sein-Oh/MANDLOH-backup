@@ -18,4 +18,4 @@ def window_capture():
 def mouse_event(x, y):
     print("X: {}, Y: {}".format(x,y))
 
-eel.start("win_capture.html")
+eel.start("capture.html")
