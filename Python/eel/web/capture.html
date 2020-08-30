@@ -22,7 +22,7 @@
     async function run() {
         const data = await eel.window_capture()();
         img.src = "data:image/jpeg;base64," + data;
-        setTimeout(run, 33);
+        setTimeout(run, 0);
     }
 
     function evt_down(event) {
