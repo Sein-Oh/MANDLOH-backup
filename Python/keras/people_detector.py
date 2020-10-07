@@ -23,10 +23,6 @@ outSize = 4
 imgFolder = 'new_image'
 imgPathAry = glob.glob(imgFolder + '/*' + 'jpg')
 
-
-# In[3]:
-
-
 dataSet = []
 labelSet = []
 for imgPath in imgPathAry:
@@ -41,46 +37,34 @@ xs = np.array(dataSet, np.float32) / 255.0
 ys = np.array(labelSet, np.uint8)
 
 
-# In[4]:
+# In[3]:
 
 
 #Load used model.
 #model = load_model('result.h5')
-#model.summary()
-
-
-# In[5]:
-
 
 #New Model setup.
 inputs = Input(shape=(imgSize, imgSize, 3))
-#mobilenetv2_model = MobileNetV2(input_shape=(imgSize, imgSize, 3), alpha=0.5, include_top=False, weights='imagenet', input_tensor=inputs, pooling='max')
-#net = Dense(128, activation='relu')(mobilenetv2_model.layers[-1].output)
-mobilenet_model = MobileNet(input_shape=(imgSize, imgSize, 3), alpha=0.5, include_top=False, weights='imagenet', input_tensor=inputs, pooling='max')
+mobilenet_model = MobileNet(input_shape=(imgSize, imgSize, 3), alpha=1, include_top=False, weights='imagenet', input_tensor=inputs, pooling='max')
 net = Dense(128, activation='relu')(mobilenet_model.layers[-1].output)
 net = Dense(64, activation='relu')(net)
 net = Dense(outSize, activation='linear')(net)
 model = Model(inputs = inputs, outputs=net)
 #model.summary()
-
-
-# In[6]:
-
-
 model.compile(optimizer = keras.optimizers.Adam(), loss='mse')
 
 
-# In[7]:
+# In[4]:
 
 
-model.fit(xs, ys, epochs=30, batch_size=32, shuffle=True, verbose=1, validation_split=0.1)
+model.fit(xs, ys, epochs=10, batch_size=32, shuffle=True, verbose=1, validation_split=0.1)
 print('done')
 
 
-# In[13]:
+# In[11]:
 
 
-index = 110
+index = 50
 my = cv2.cvtColor(cv2.imread(imgPathAry[index]), cv2.COLOR_BGR2RGB)
 pred = img_to_array(my) / 255
 pred = np.expand_dims(pred, axis=0)
