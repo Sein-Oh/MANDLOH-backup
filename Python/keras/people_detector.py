@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 from keras.layers import Input, Dense, Flatten
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.models import Model, load_model, Sequential
-from keras.applications.mobilenet_v2 import MobileNetV2
-from keras.applications.mobilenet import MobileNet
+from keras.applications import MobileNetV2
+from keras.applications import MobileNet
 from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array, array_to_img
 
 
@@ -45,7 +45,8 @@ ys = np.array(labelSet, np.uint8)
 
 #New Model setup.
 inputs = Input(shape=(imgSize, imgSize, 3))
-mobilenet_model = MobileNet(input_shape=(imgSize, imgSize, 3), alpha=1, include_top=False, weights='imagenet', input_tensor=inputs, pooling='max')
+mobilenet_model = MobileNet(input_shape=(imgSize, imgSize, 3), alpha=0.5, include_top=False, weights='imagenet', input_tensor=inputs, pooling='max')
+#mobilenet_model = MobileNetV2(input_shape=(imgSize, imgSize, 3), alpha=0.5, include_top=False, weights='imagenet', input_tensor=inputs, pooling='max')
 net = Dense(128, activation='relu')(mobilenet_model.layers[-1].output)
 net = Dense(64, activation='relu')(net)
 net = Dense(outSize, activation='linear')(net)
