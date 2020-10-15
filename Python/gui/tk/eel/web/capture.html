@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Streaming from LD Player</title>
+</head>
+
+<body>
+    <img id='img'>
+</body>
+<script type="text/javascript" src="/eel.js"></script>
+<script>
+    const img = document.getElementById('img');
+    img.draggable = false;
+    img.addEventListener('mousedown', evt_down);
+
+    eel.expose(render_img);
+    function render_img(data) {
+        img.src = "data:image/jpeg;base64," + data;
+    }
+
+    async function run() {
+        const data = await eel.window_capture()();
+        img.src = "data:image/jpeg;base64," + data;
+        setTimeout(run, 0);
+    }
+
+    function evt_down(event) {
+        const img_pos = img.getBoundingClientRect();
+        const x = Math.round(event.clientX - img_pos.left);
+        const y = Math.round(event.clientY - img_pos.top);
+        eel.mouse_event(x, y);
+    }
+    setTimeout(run, 0);
+</script>
+
+</html>
