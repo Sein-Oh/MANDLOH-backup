@@ -4,6 +4,12 @@
 <head>
     <title>Streaming from LD Player</title>
 </head>
+<style>
+    body {
+        -webkit-user-select: none;
+        overscroll-behavior: none;
+    }
+</style>
 
 <body>
     <img id='img'>
@@ -15,6 +21,9 @@
     img.addEventListener('mousedown', evt_mouse);
     img.addEventListener('mousemove', evt_mouse);
     img.addEventListener('mouseup', evt_mouse);
+    img.addEventListener('touchstart', evt_mouse);
+    img.addEventListener('touchmove', evt_mouse);
+    img.addEventListener('thochend', evt_mouse);
 
     async function run() {
         const data = await eel.capture()();
@@ -25,9 +34,16 @@
     let [x0, x1, y0, y1] = [0, 0, 0, 0];
     function evt_mouse(event) {
         const img_pos = img.getBoundingClientRect();
-        x = Math.round(event.clientX - img_pos.left);
-        y = Math.round(event.clientY - img_pos.top);
-        if (event.type == "mousedown") {
+        try {
+            x = Math.round(event.touches[0].clientX - img_pos.left);
+            y = Math.round(event.touches[0].clientY - img_pos.top);
+        }
+        catch {
+            x = Math.round(event.clientX - img_pos.left);
+            y = Math.round(event.clientY - img_pos.top);
+        }
+
+        if (event.type == "mousedown" || event.type == "touchstart") {
             x0 = x;
             y0 = y;
         }
