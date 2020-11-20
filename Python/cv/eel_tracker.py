@@ -4,7 +4,7 @@ import base64
 import numpy as np
 import webbrowser
 
-cap = cv2.VideoCapture("lsf.mp4")
+cap = cv2.VideoCapture("a.mp4")
 #w, h = 640, 480
 #cap.set(cv2.CAP_PROP_FRAME_WIDTH, w) #set caputre size
 #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
@@ -49,5 +49,8 @@ def mouse_event(type, x0, y0, x1, y1):
         on_select, on_track = True, False
     if type == "mouseup":
         on_select, on_track, tracker_flag = False, True, True
+        if w < 5 or h < 5:
+            print("Too small target. Select again.")
+            on_track = False
 
 eel.start("capture.html", mode='edge')
