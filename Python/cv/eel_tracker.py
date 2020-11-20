@@ -45,10 +45,12 @@ def capture():
 @eel.expose
 def mouse_event(type, x, y):
     global on_select, on_track, tracker_flag, mouse_pos, bbox
-    mouse_pos[2:] = x, y
     if type == "start":
         on_select, on_track = True, False
         mouse_pos[:2] = x, y
+
+    elif type == "move":
+        mouse_pos[2:] = x, y
 
     w, h = abs(mouse_pos[0] - mouse_pos[2]), abs(mouse_pos[1] - mouse_pos[3])
     bbox = (min(mouse_pos[0], mouse_pos[2]),
@@ -62,4 +64,4 @@ def mouse_event(type, x, y):
             on_select, on_track, tracker_flag = False, True, True
 
 
-eel.start("capture.html", mode=None)
+eel.start("capture.html")
