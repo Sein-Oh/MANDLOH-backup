@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Streaming from LD Player</title>
+    <title>MANDLOH-Object tracking</title>
 </head>
 <style>
     body {
@@ -31,23 +31,27 @@
         setTimeout(run, 0);
     }
 
-    let [x0, x1, y0, y1] = [0, 0, 0, 0];
     function evt_mouse(event) {
         const img_pos = img.getBoundingClientRect();
         try {
-            x1 = Math.round(event.touches[0].clientX - img_pos.left);
-            y1 = Math.round(event.touches[0].clientY - img_pos.top);
+            x = Math.round(event.touches[0].clientX - img_pos.left);
+            y = Math.round(event.touches[0].clientY - img_pos.top);
         }
         catch {
-            x1 = Math.round(event.clientX - img_pos.left);
-            y1 = Math.round(event.clientY - img_pos.top);
+            x = Math.round(event.clientX - img_pos.left);
+            y = Math.round(event.clientY - img_pos.top);
         }
-
-        if (event.type == "mousedown" || event.type == "touchstart") {
-            x0 = x1;
-            y0 = y1;
+        let evt_type;
+        if (event.type == "mousedown" || event.type == "touchstart"){
+            evt_type = "start";
         }
-        eel.mouse_event(event.type, x0, y0, x1, y1);
+        else if (event.type == "mousemove" || event.type == "touchmove"){
+            evt_type = "move";
+        }
+        else if (event.type == "mouseup" || event.type == "touchend"){
+            evt_type = "end";
+        }
+        eel.mouse_event(evt_type, x, y);
     }
     setTimeout(run, 0);
 </script>
