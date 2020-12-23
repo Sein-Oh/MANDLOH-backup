@@ -17,9 +17,13 @@
   1. 다음 주소에서 ESPAsyncWebserver 설치  
   https://github.com/me-no-dev/ESPAsyncWebServer  
   1. 라이브러리 설치방법 : Github에서 zip 파일로 내려받은 후, 스케치 -> 라이브러리 포함하기 -> .ZIP 라이브러리  
-  
 
-## 4. 참고 링크
+## 4. Telegram Bot 라이브러리 설치
+  1. 다음 주소에서 라이브러리 설치  
+  https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
+
+
+## 00. 참고 링크
   1. ESP CAM 사용법  
     https://blog.naver.com/PostView.nhn?blogId=roboholic84&logNo=221601808100&categoryNo=7&parentCategoryNo=0
   2. Websocket 사용법  
