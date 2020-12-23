@@ -7,14 +7,16 @@
 ## 2. ESP CAM 스케치 업로드
   - 툴 -> 보드 -> "WSP32 Wrover Module" 선택  
   - 툴 -> Upload Speed : "921600" 선택(권장)  
-  - 툴 -> Partition Scheme : "Huge App (3MB No OTA/1MB SPIFFS)" 선택  
+  - 툴 -> Partition Scheme : "Huge App (3MB No OTA/1MB SPIFFS)" 선택 
+  - 업로드 모드로 설정 : IO0 핀과 GND 연결
+  - 업로드 중 Connecting .... 에서 시간이 오래걸리면 리셋버튼을 눌러볼 
 
 ## 3. Websocket 라이브러리 설치
-  1. 라이브러리 설치방법 : Github에서 zip 파일로 내려받은 후, 스케치 -> 라이브러리 포함하기 -> .ZIP 라이브러리 
   1. 다음 주소에서 AsyncTCP 설치  
-  https://github.com/me-no-dev/AsyncTCP
+  https://github.com/me-no-dev/AsyncTCP  
   1. 다음 주소에서 ESPAsyncWebserver 설치  
-  https://github.com/me-no-dev/ESPAsyncWebServer
+  https://github.com/me-no-dev/ESPAsyncWebServer  
+  1. 라이브러리 설치방법 : Github에서 zip 파일로 내려받은 후, 스케치 -> 라이브러리 포함하기 -> .ZIP 라이브러리  
   
 
 ## 4. 참고 링크
