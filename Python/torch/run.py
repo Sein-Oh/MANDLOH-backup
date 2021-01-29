@@ -1,8 +1,8 @@
 import cv2
 import torch
 import numpy as np
-from experimental import attempt_load
-from general import non_max_suppression
+from models.experimental import attempt_load
+from utils.general import non_max_suppression
 
 
 with torch.no_grad():
